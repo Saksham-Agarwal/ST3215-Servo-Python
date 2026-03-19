@@ -52,7 +52,41 @@ class ST3215:
         
         print(f"Scan complete. Found {len(found)} servos.")
         return found
+    
+    def change_id(self, current_id, new_id):
+        """
+        Unlocks EPROM, changes the servo ID, and locks EPROM.
+        WARNING: It is highly recommended to only have ONE servo physically 
+        connected to the board when performing this action to prevent accidents.
+        """
+        # IDs must be between 0 and 253 (254 is the broadcast ID)
+        if not (0 <= new_id <= 253):
+            print("Error: New ID must be between 0 and 253.")
+            return False
 
+        print(f"Attempting to change servo ID from {current_id} to {new_id}...")
+
+        # Step 1: Unlock EPROM
+        result, error = self.packetHandler.unLockEprom(current_id)
+        if result != COMM_SUCCESS or error != 0:
+            print("Failed to unlock EPROM.")
+            return False
+
+        # Step 2: Write the new ID to the ID register ('scs_id' is defined in the SDK)
+        result, error = self.packetHandler.write1ByteTxRx(current_id, scs_id, new_id)
+        if result != COMM_SUCCESS:
+            print(f"Write Comm Error: {self.packetHandler.getTxRxResult(result)}")
+            return False
+        if error != 0:
+            print(f"Write Hardware Error: {self.packetHandler.getRxPacketError(error)}")
+            return False
+
+        # Step 3: Lock EPROM to save the new ID permanently
+        # Note: Once the ID changes, we use the old ID to lock it per the SDK's reference design
+        self.packetHandler.LockEprom(current_id) 
+        
+        print(f"Successfully changed Servo ID from {current_id} to {new_id}!")
+        return True
     def close(self):
         self.portHandler.closePort()
         print("Port closed.")
