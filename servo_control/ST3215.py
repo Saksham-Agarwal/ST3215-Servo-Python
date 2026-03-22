@@ -5,9 +5,12 @@ sys.path.append("..")
 from scservo_sdk import *                   # Uses SC Servo SDK library
 
 class ST3215:
-    def __init__(self, device_name, baudrate=1000000):
+    def __init__(self, device_name, baudrate=1000000, speed=2400, acceleration=50):
         self.portHandler = PortHandler(device_name)
         self.packetHandler = sms_sts(self.portHandler)
+        self.SCS_MOVING_SPEED = speed
+        self.SCS_MOVING_ACC = acceleration
+        
 
         # Fail fast if hardware isn't responding
         if not self.portHandler.openPort():
@@ -26,17 +29,14 @@ class ST3215:
         print(f"Checking Servo ID {servo_id}...")
         model, result, error = self.packetHandler.ping(servo_id)
 
-        # 1. Check for communication timeouts or wire issues
         if result != COMM_SUCCESS:
             print(f" Not working, [ID:{servo_id:03d}] Comm Error: {self.packetHandler.getTxRxResult(result)}")
             return False
 
-        # 2. Check for internal hardware errors on the servo itself (e.g., overheating, overload)
         if error != 0:
             print(f" Not working, [ID:{servo_id:03d}] Hardware Error: {self.packetHandler.getRxPacketError(error)}")
             return False
 
-        # 3. Success
         print(f" [ID:{servo_id:03d}] Succeeded! SC Servo model number: {model}")
         return True
 
@@ -62,8 +62,6 @@ class ST3215:
         # IDs must be between 0 and 253 (254 is the broadcast ID)
         if not (0 <= new_id <= 253):
             print("Error: New ID must be between 0 and 253.")
-            return False
-
         print(f"Attempting to change servo ID from {current_id} to {new_id}...")
 
         # Step 1: Unlock EPROM
@@ -87,16 +85,39 @@ class ST3215:
         
         print(f"Successfully changed Servo ID from {current_id} to {new_id}!")
         return True
+
+    def write_angle(self, servo_id, angle):
+        scs_comm_result, scs_error = self.packetHandler.WritePosEx(servo_id, angle, self.SCS_MOVING_SPEED, self.SCS_MOVING_ACC)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
+        elif scs_error != 0:
+            print("%s" % self.packetHandler.getRxPacketError(scs_error))
+
+    def read_angle_speed(self, servo_id):
+        scs_present_position, scs_present_speed, scs_comm_result, scs_error = self.packetHandler.ReadPosSpeed(servo_id)
+        if scs_comm_result != COMM_SUCCESS:
+            print(self.packetHandler.getTxRxResult(scs_comm_result))
+        else:
+            print("[ID:%03d] PresPos:%d PresSpd:%d" % (servo_id, scs_present_position, scs_present_speed))
+        if scs_error != 0:
+            print(self.packetHandler.getRxPacketError(scs_error))
+    
+    def wheel(self, servo_id, rot_speed):
+        scs_comm_result, scs_error = self.packetHandler.WheelMode(servo_id)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
+        elif scs_error != 0:
+            print("%s" % self.packetHandler.getRxPacketError(scs_error))   
+        
+        scs_comm_result, scs_error = self.packetHandler.WriteSpec(servo_id, rot_speed, self.SCS_MOVING_ACC)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
+        if scs_error != 0:
+            print("%s" % self.packetHandler.getRxPacketError(scs_error))
+
+    
     def close(self):
         self.portHandler.closePort()
         print("Port closed.")
         
 
-
-# Initialize the bus (replace 'COM3' or '/dev/ttyUSB0' with your actual port)
-my_bus = ST3215('COM5')
-
-
-
-# Clean up
-my_bus.close()
