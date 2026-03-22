@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: st3215-servo
+Version: 0.1.0
+Summary: Python library for ST3215 bus servo control
+Author: Saksham Agarwal
+Dynamic: author
+Dynamic: summary

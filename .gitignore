@@ -2,3 +2,7 @@
 venv/
 .env/
 .venv/
+
+# the pycache stuff
+__pycache__/
+*.py[cod]
