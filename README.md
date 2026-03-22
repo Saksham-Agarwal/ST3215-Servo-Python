@@ -39,7 +39,7 @@ cd ST3215-Servo-Python
 
 ---
 
-## Setup (Virtual Environment)
+## Setup (Virtual Environment) [for windows]
 
 ```bash
 python -m venv .venv
@@ -52,6 +52,18 @@ pip install -r requirements.txt
 deactivate
 ```
 
+
+## Setup (Virtual Environment) [for ubuntu]
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+# Install dependencies
+pip install -r requirements.txt
+
+# Deactivate environment
+deactivate
+```
 ---
 
 ## Example
