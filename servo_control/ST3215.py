@@ -79,8 +79,6 @@ class ST3215:
             print(f"Write Hardware Error: {self.packetHandler.getRxPacketError(error)}")
             return False
 
-        # Step 3: Lock EPROM to save the new ID permanently
-        # Note: Once the ID changes, we use the old ID to lock it per the SDK's reference design
         self.packetHandler.LockEprom(current_id) 
         
         print(f"Successfully changed Servo ID from {current_id} to {new_id}!")
@@ -97,10 +95,12 @@ class ST3215:
         scs_present_position, scs_present_speed, scs_comm_result, scs_error = self.packetHandler.ReadPosSpeed(servo_id)
         if scs_comm_result != COMM_SUCCESS:
             print(self.packetHandler.getTxRxResult(scs_comm_result))
-        else:
-            print("[ID:%03d] PresPos:%d PresSpd:%d" % (servo_id, scs_present_position, scs_present_speed))
+        # else:
+        #     print("[ID:%03d] PresPos:%d PresSpd:%d" % (servo_id, scs_present_position, scs_present_speed))
         if scs_error != 0:
             print(self.packetHandler.getRxPacketError(scs_error))
+        
+        return scs_present_position, scs_present_speed
     
     def wheel(self, servo_id, rot_speed):
         scs_comm_result, scs_error = self.packetHandler.WheelMode(servo_id)
@@ -114,6 +114,16 @@ class ST3215:
             print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
         if scs_error != 0:
             print("%s" % self.packetHandler.getRxPacketError(scs_error))
+
+    def ReadCurrent(self, servo_id):
+        scs_current_current, scs_comm_result, scs_error = self.packetHandler.ReadCurrent(servo_id)
+        if scs_comm_result != COMM_SUCCESS:
+            print(self.packetHandler.getTxRxResult(scs_comm_result))
+        # else:
+        #     print("[ID:%03d] Current Current:%d" % (servo_id, scs_current_current))
+        if scs_error != 0:
+            print(self.packetHandler.getRxPacketError(scs_error))
+        return scs_current_current
 
     
     def close(self):

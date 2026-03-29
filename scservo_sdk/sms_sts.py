@@ -59,7 +59,7 @@ SMS_STS_PRESENT_CURRENT_H = 70
 
 class sms_sts(protocol_packet_handler):
     def __init__(self, portHandler):
-        protocol_packet_handler.__init__(self, portHandler, 0)
+        protocol_packet_handler.__init__    (self, portHandler, 0)
         self.groupSyncWrite = GroupSyncWrite(self, SMS_STS_ACC, 7)
 
     def WritePosEx(self, scs_id, position, speed, acc):
@@ -102,6 +102,15 @@ class sms_sts(protocol_packet_handler):
         speed = self.scs_toscs(speed, 15)
         txpacket = [acc, 0, 0, 0, 0, self.scs_lobyte(speed), self.scs_hibyte(speed)]
         return self.writeTxRx(scs_id, SMS_STS_ACC, len(txpacket), txpacket)
+    
+    def ReadTemp(self, scs_id):
+        temp, scs_comm_result, scs_error = self.read1ByteRx(scs_id, SMS_STS_PRESENT_TEMPERATURE)
+        return temp, scs_comm_result, scs_error
+    
+    def ReadCurrent(self, scs_id):
+        current, scs_comm_result, scs_error = self.read2ByteRx(scs_id, SMS_STS_PRESENT_CURRENT_L)
+        return current, scs_comm_result, scs_error
+    
 
     def LockEprom(self, scs_id):
         return self.write1ByteTxRx(scs_id, SMS_STS_LOCK, 1)
