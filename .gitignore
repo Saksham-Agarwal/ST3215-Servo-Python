@@ -6,3 +6,5 @@ venv/
 # the pycache stuff
 __pycache__/
 *.py[cod]
+
+st3215_servo.egg-info/
