@@ -134,9 +134,6 @@ class ST3215:
         if scs_error != 0:
             print(self.packetHandler.getRxPacketError(scs_error))
         return scs_current_temperature
-
-
-
     
     def close(self):
         self.portHandler.closePort()

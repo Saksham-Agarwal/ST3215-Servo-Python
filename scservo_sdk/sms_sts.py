@@ -104,11 +104,11 @@ class sms_sts(protocol_packet_handler):
         return self.writeTxRx(scs_id, SMS_STS_ACC, len(txpacket), txpacket)
     
     def ReadTemp(self, scs_id):
-        temp, scs_comm_result, scs_error = self.read1ByteRx(scs_id, SMS_STS_PRESENT_TEMPERATURE)
+        temp, scs_comm_result, scs_error = self.read1ByteTxRx(scs_id, SMS_STS_PRESENT_TEMPERATURE)
         return temp, scs_comm_result, scs_error
     
     def ReadCurrent(self, scs_id):
-        current, scs_comm_result, scs_error = self.read2ByteRx(scs_id, SMS_STS_PRESENT_CURRENT_L)
+        current, scs_comm_result, scs_error = self.read2ByteTxRx(scs_id, SMS_STS_PRESENT_CURRENT_L)
         return current, scs_comm_result, scs_error
     
 
