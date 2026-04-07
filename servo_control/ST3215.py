@@ -129,10 +129,12 @@ class ST3215:
         scs_current_temperature, scs_comm_result, scs_error = self.packetHandler.ReadTemp(servo_id)
         if scs_comm_result != COMM_SUCCESS:
             print(self.packetHandler.getTxRxResult(scs_comm_result))
+            
         # else:
         #     print("[ID:%03d] Current Temperature:%d" % (servo_id, scs_current_temperature))
         if scs_error != 0:
             print(self.packetHandler.getRxPacketError(scs_error))
+        scs_current_temperature = scs_current_temperature * 6.5
         return scs_current_temperature
     
     def close(self):

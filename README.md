@@ -155,6 +155,21 @@ Sets the servo to continuous rotation mode.
 
 ---
 
+### `ReadTemp(servo_id)`
+
+Returns Temperature value in celsius.
+
+* **servo_id**: Servo ID
+
+---
+
+### `ReadCurrent(servo_id, rot_speed)`
+
+Returns current draw of the servo motor in mA.
+
+* **servo_id**: Servo ID
+
+---
 ### `close()`
 
 Closes the serial port connection.
